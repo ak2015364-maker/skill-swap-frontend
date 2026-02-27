@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import API from '../services/api';
+import { useEffect, useState } from "react";
+import API from "../services/api";
 
 export default function Requests() {
   const [requests, setRequests] = useState([]);
@@ -7,43 +7,41 @@ export default function Requests() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchRequests();
-    fetchSentRequests();
+    fetchAllRequests();
   }, []);
 
-  const fetchRequests = async () => {
+  const fetchAllRequests = async () => {
     try {
-      const res = await API.get('/swaps/received');
-      setRequests(res.data);
+      setLoading(true);
+
+      const receivedRes = await API.get("/api/swaps/received");
+      const sentRes = await API.get("/api/swaps/my");
+
+      setRequests(receivedRes.data);
+      setSentRequests(sentRes.data);
+
     } catch (err) {
-      console.error(err);
-      alert('Failed to load received requests');
+      console.error("Request fetch error:", err.response?.data || err.message);
+      alert("Failed to load requests");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchSentRequests = async () => {
-    try {
-      const res = await API.get('/swaps/my');
-      setSentRequests(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const updateStatus = async (id, status) => {
     try {
-      await API.patch(`/swaps/${id}`, { status });
+      await API.patch(`/api/swaps/${id}`, { status });
 
+      // update UI instantly
       setRequests((prev) =>
         prev.map((r) =>
           r._id === id ? { ...r, status } : r
         )
       );
+
     } catch (err) {
-      console.error(err);
-      alert('Failed to update request');
+      console.error("Status update error:", err.response?.data || err.message);
+      alert("Failed to update request");
     }
   };
 
@@ -52,60 +50,60 @@ export default function Requests() {
 
   return (
     <div>
-      <h2>Requests received</h2>
+      <h2>Requests Received</h2>
 
       {requests.length === 0 ? (
         <div className="card muted">No requests yet.</div>
       ) : (
-        <div style={{ display: 'grid', gap: 12 }}>
+        <div style={{ display: "grid", gap: 12 }}>
           {requests.map((r) => (
             <div
               key={r._id}
               className="card"
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
               <div>
                 <div style={{ fontWeight: 700 }}>
-                  {r.fromUser?.username || 'User'}
+                  {r.fromUser?.username || "User"}
                 </div>
 
                 <div className="small muted">
-                  Offered: {r.offeredSkill?.title || '—'} • Requested:{' '}
-                  {r.requestedSkill?.title || '—'}
+                  Offered: {r.offeredSkill?.title || "—"} • Requested:{" "}
+                  {r.requestedSkill?.title || "—"}
                 </div>
 
                 <div className="muted">
-                  Status: {r.status || 'pending'}
+                  Status: {r.status || "pending"}
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: 8 }}>
-                {r.status !== 'accepted' && (
+              <div style={{ display: "flex", gap: 8 }}>
+                {r.status !== "accepted" && (
                   <button
                     className="btn"
                     onClick={() =>
-                      updateStatus(r._id, 'accepted')
+                      updateStatus(r._id, "accepted")
                     }
                   >
                     Accept
                   </button>
                 )}
 
-                {r.status !== 'rejected' && (
+                {r.status !== "rejected" && (
                   <button
                     style={{
-                      background: '#ef4444',
-                      color: '#fff',
+                      background: "#ef4444",
+                      color: "#fff",
                       border: 0,
-                      padding: '8px 10px',
+                      padding: "8px 10px",
                       borderRadius: 8,
                     }}
                     onClick={() =>
-                      updateStatus(r._id, 'rejected')
+                      updateStatus(r._id, "rejected")
                     }
                   >
                     Reject
@@ -117,27 +115,27 @@ export default function Requests() {
         </div>
       )}
 
-      <h2 style={{ marginTop: 20 }}>Requests sent</h2>
+      <h2 style={{ marginTop: 20 }}>Requests Sent</h2>
 
       {sentRequests.length === 0 ? (
         <div className="card muted">
           You haven't sent any requests yet.
         </div>
       ) : (
-        <div style={{ display: 'grid', gap: 12 }}>
+        <div style={{ display: "grid", gap: 12 }}>
           {sentRequests.map((r) => (
             <div key={r._id} className="card">
               <div style={{ fontWeight: 700 }}>
-                {r.toUser?.username || 'User'}
+                {r.toUser?.username || "User"}
               </div>
 
               <div className="small muted">
-                Offered: {r.offeredSkill?.title || '—'} • Requested:{' '}
-                {r.requestedSkill?.title || '—'}
+                Offered: {r.offeredSkill?.title || "—"} • Requested:{" "}
+                {r.requestedSkill?.title || "—"}
               </div>
 
               <div className="muted">
-                Status: {r.status || 'pending'}
+                Status: {r.status || "pending"}
               </div>
             </div>
           ))}
