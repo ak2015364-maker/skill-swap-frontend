@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import Modal from "../components/Modal";
@@ -35,7 +34,7 @@ export default function Profile() {
   const fetchProfile = async () => {
     try {
       setError("");
-      const res = await API.get('/users/profile');
+      const res = await API.get('/api/users/profile');
       setProfile(res.data);
       setForm(res.data);
       // fetch user's skills
