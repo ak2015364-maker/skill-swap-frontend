@@ -39,7 +39,7 @@ export default function Profile() {
       setForm(res.data);
       // fetch user's skills
       try{
-        const s = await API.get('/skills/my');
+        const s = await API.get('/api/skills/my');
         setMySkills(s.data);
       }catch(err){
         console.error('failed loading my skills', err);
@@ -58,7 +58,7 @@ export default function Profile() {
     e.preventDefault();
     setSaving(true);
     try {
-      await API.put('/users/profile', form);
+      await API.put('/api/users/profile', form);
       setEdit(false);
       fetchProfile();
     } catch (err) {
@@ -74,7 +74,7 @@ export default function Profile() {
     e?.preventDefault?.();
     setBioSaving(true);
     try {
-      await API.put('/users/profile', { bio: form.bio });
+      await API.put('/api/users/profile', { bio: form.bio });
       setBioEdit(false);
       fetchProfile();
     } catch (err) {
@@ -99,7 +99,7 @@ export default function Profile() {
         employedYears: Number(formEmployedYears) || 0,
         employer: formEmployer
       };
-      await API.post('/skills/add', payload);
+      await API.post('/api/skills/add', payload);
       // refresh profile and skills
       fetchProfile();
       setToast('Skill added');
@@ -239,7 +239,7 @@ export default function Profile() {
               <button style={{background:'#ef4444',color:'#fff',border:0,padding:'8px 10px',borderRadius:8}} onClick={async ()=>{
                 if(!skillToWithdraw) return;
                 try{
-                  await API.delete(`/skills/${skillToWithdraw._id}`);
+                  await API.delete(`/api/skills/${skillToWithdraw._id}`);
                   setMySkills(ms=>ms.filter(x=>x._id!==skillToWithdraw._id));
                   // Notify other parts of the app that a skill was removed so they can refresh lists
                   try{ window.dispatchEvent(new CustomEvent('skill:removed', { detail: skillToWithdraw._id })); }catch(e){/* ignore */}
