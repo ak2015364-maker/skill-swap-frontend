@@ -13,7 +13,7 @@ function Login({ setToken }) {
     e.preventDefault();
 
     try {
-      const response = await API.post("/users/login", {
+      const response = await API.post("/api/users/login", {
         email,
         password,
       });
